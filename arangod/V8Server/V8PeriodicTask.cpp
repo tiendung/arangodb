@@ -41,6 +41,7 @@ Mutex V8PeriodicTask::RUNNING_LOCK;
 
 void V8PeriodicTask::jobDone(Task* task) {
   try {
+    MUTEX_LOCKER(RUNNING_LOCK);
     RUNNING.erase(task);
   } catch (...) {
     // ignore any memory error
