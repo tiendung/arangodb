@@ -40,9 +40,9 @@ class HttpResponse;
 namespace rest {
 class GeneralServer;
 
-class HttpCommTask : public SocketTask, public RequestStatisticsAgent {
-  HttpCommTask(HttpCommTask const&) = delete;
-  HttpCommTask const& operator=(HttpCommTask const&) = delete;
+class GeneralCommTask : public SocketTask, public RequestStatisticsAgent {
+  GeneralCommTask(GeneralCommTask const&) = delete;
+  GeneralCommTask const& operator=(GeneralCommTask const&) = delete;
 
  public:
   static size_t const MaximalHeaderSize;
@@ -51,11 +51,11 @@ class HttpCommTask : public SocketTask, public RequestStatisticsAgent {
   static size_t const RunCompactEvery;
 
  public:
-  HttpCommTask(GeneralServer*, TRI_socket_t, ConnectionInfo&&,
+  GeneralCommTask(GeneralServer*, TRI_socket_t, ConnectionInfo&&,
                double keepAliveTimeout);
 
  protected:
-  ~HttpCommTask();
+  virtual ~GeneralCommTask();
 
  public:
   // return whether or not the task desires to start a dispatcher thread
@@ -81,7 +81,7 @@ class HttpCommTask : public SocketTask, public RequestStatisticsAgent {
   // task set up complete
   void setupDone();
 
- private:
+ //private:
   // returns the authentication realm
   std::string authenticationRealm() const;
 
@@ -133,7 +133,7 @@ class HttpCommTask : public SocketTask, public RequestStatisticsAgent {
   // allow method override
   bool _allowMethodOverride;
 
- private:
+ //private:
   // write buffers
   std::deque<basics::StringBuffer*> _writeBuffers;
 
@@ -205,8 +205,16 @@ class HttpCommTask : public SocketTask, public RequestStatisticsAgent {
 
   // authentication real
   std::string const _authenticationRealm;
+}; //Commontask
+
+class HttpCommTask : public GeneralCommTask {
+  template<typename... Args>
+      HttpCommTask( Args&&... args ) : GeneralCommTask(std::forward<Args>(args)...){};
 };
-}
-}
+
+
+
+}  //rest
+} //arango
 
 #endif

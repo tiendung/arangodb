@@ -27,7 +27,7 @@
 #include "Basics/WorkMonitor.h"
 #include "Dispatcher/DispatcherQueue.h"
 #include "GeneralServer/AsyncJobManager.h"
-#include "GeneralServer/HttpCommTask.h"
+#include "GeneralServer/GeneralCommTask.h"
 #include "GeneralServer/GeneralServer.h"
 #include "GeneralServer/RestHandler.h"
 #include "Logger/Logger.h"

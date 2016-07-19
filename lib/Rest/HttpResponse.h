@@ -34,9 +34,11 @@ class RestBatchHandler;
 
 namespace rest {
 class HttpCommTask;
+class GeneralCommTask;
 }
 
 class HttpResponse : public GeneralResponse {
+  friend class rest::GeneralCommTask;
   friend class rest::HttpCommTask;
   friend class RestBatchHandler; // TODO must be removed
 

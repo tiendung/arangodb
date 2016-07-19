@@ -30,7 +30,7 @@
 #include "Dispatcher/DispatcherFeature.h"
 #include "Endpoint/EndpointList.h"
 #include "GeneralServer/AsyncJobManager.h"
-#include "GeneralServer/HttpCommTask.h"
+#include "GeneralServer/GeneralCommTask.h"
 #include "GeneralServer/GeneralListenTask.h"
 #include "GeneralServer/HttpServerJob.h"
 #include "GeneralServer/RestHandler.h"
@@ -85,14 +85,14 @@ GeneralServer::~GeneralServer() { stopListening(); }
 /// @brief generates a suitable communication task
 ////////////////////////////////////////////////////////////////////////////////
 
-HttpCommTask* GeneralServer::createCommTask(TRI_socket_t s,
+GeneralCommTask* GeneralServer::createCommTask(TRI_socket_t s,
                                             ConnectionInfo&& info,
                                             ConnectionType conntype) {
   switch (conntype) {
     case ConnectionType::VSTREAM:
-      return new HttpCommTask(this, s, std::move(info), _keepAliveTimeout);
+      return new GeneralCommTask(this, s, std::move(info), _keepAliveTimeout);
     default:
-      return new HttpCommTask(this, s, std::move(info), _keepAliveTimeout);
+      return new GeneralCommTask(this, s, std::move(info), _keepAliveTimeout);
   }
 }
 
@@ -148,7 +148,7 @@ void GeneralServer::stopListening() {
 
 void GeneralServer::stop() {
   while (true) {
-    HttpCommTask* task = nullptr;
+    GeneralCommTask* task = nullptr;
 
     {
       MUTEX_LOCKER(mutexLocker, _commTasksLock);
@@ -170,7 +170,7 @@ void GeneralServer::stop() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void GeneralServer::handleConnected(TRI_socket_t s, ConnectionInfo&& info) {
-  HttpCommTask* task = createCommTask(s, std::move(info));
+  GeneralCommTask* task = createCommTask(s, std::move(info));
 
   try {
     MUTEX_LOCKER(mutexLocker, _commTasksLock);
@@ -190,7 +190,7 @@ void GeneralServer::handleConnected(TRI_socket_t s, ConnectionInfo&& info) {
 /// @brief handles a connection close
 ////////////////////////////////////////////////////////////////////////////////
 
-void GeneralServer::handleCommunicationClosed(HttpCommTask* task) {
+void GeneralServer::handleCommunicationClosed(GeneralCommTask* task) {
   MUTEX_LOCKER(mutexLocker, _commTasksLock);
   _commTasks.erase(task);
 }
@@ -199,7 +199,7 @@ void GeneralServer::handleCommunicationClosed(HttpCommTask* task) {
 /// @brief handles a connection failure
 ////////////////////////////////////////////////////////////////////////////////
 
-void GeneralServer::handleCommunicationFailure(HttpCommTask* task) {
+void GeneralServer::handleCommunicationFailure(GeneralCommTask* task) {
   MUTEX_LOCKER(mutexLocker, _commTasksLock);
   _commTasks.erase(task);
 }
@@ -208,7 +208,7 @@ void GeneralServer::handleCommunicationFailure(HttpCommTask* task) {
 /// @brief create a job for asynchronous execution (using the dispatcher)
 ////////////////////////////////////////////////////////////////////////////////
 
-bool GeneralServer::handleRequestAsync(HttpCommTask* task,
+bool GeneralServer::handleRequestAsync(GeneralCommTask* task,
                                        WorkItem::uptr<RestHandler>& handler,
                                        uint64_t* jobId) {
   bool startThread = task->startThread();
@@ -254,7 +254,7 @@ bool GeneralServer::handleRequestAsync(HttpCommTask* task,
 /// @brief executes the handler directly or add it to the queue
 ////////////////////////////////////////////////////////////////////////////////
 
-bool GeneralServer::handleRequest(HttpCommTask* task,
+bool GeneralServer::handleRequest(GeneralCommTask* task,
                                   WorkItem::uptr<RestHandler>& handler) {
   // direct handlers
   if (handler->isDirect()) {
@@ -270,7 +270,7 @@ bool GeneralServer::handleRequest(HttpCommTask* task,
   std::unique_ptr<Job> job = std::make_unique<HttpServerJob>(this, handler);
   task->RequestStatisticsAgent::transferTo(job.get());
 
-  LOG(TRACE) << "HttpCommTask " << (void*)task << " created HttpServerJob "
+  LOG(TRACE) << "GeneralCommTask " << (void*)task << " created HttpServerJob "
              << (void*)job.get();
 
   // add the job to the dispatcher
@@ -312,7 +312,7 @@ bool GeneralServer::openEndpoint(Endpoint* endpoint) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void GeneralServer::handleRequestDirectly(RestHandler* handler,
-                                          HttpCommTask* task) {
+                                          GeneralCommTask* task) {
   task->RequestStatisticsAgent::transferTo(handler);
   RestHandler::status result = handler->executeFull();
   handler->RequestStatisticsAgent::transferTo(task);

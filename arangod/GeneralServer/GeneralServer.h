@@ -39,7 +39,7 @@ namespace rest {
 
 class AsyncJobManager;
 class Dispatcher;
-class HttpCommTask;
+class GeneralCommTask;
 class HttpServerJob;
 class Job;
 class ListenTask;
@@ -76,7 +76,7 @@ class GeneralServer : protected TaskManager {
   }
 
   // generates a suitable communication task
-  virtual HttpCommTask* createCommTask(TRI_socket_t, ConnectionInfo&&, ConnectionType = ConnectionType::HTTP);
+  virtual GeneralCommTask* createCommTask(TRI_socket_t, ConnectionInfo&&, ConnectionType = ConnectionType::HTTP);
 
  public:
   // list of trusted origin urls for CORS
@@ -100,23 +100,23 @@ class GeneralServer : protected TaskManager {
   void handleConnected(TRI_socket_t s, ConnectionInfo&& info);
 
   // handles a connection close
-  void handleCommunicationClosed(HttpCommTask*);
+  void handleCommunicationClosed(GeneralCommTask*);
 
   // handles a connection failure
-  void handleCommunicationFailure(HttpCommTask*);
+  void handleCommunicationFailure(GeneralCommTask*);
 
   // creates a job for asynchronous execution
-  bool handleRequestAsync(HttpCommTask*, arangodb::WorkItem::uptr<RestHandler>&,
+  bool handleRequestAsync(GeneralCommTask*, arangodb::WorkItem::uptr<RestHandler>&,
                           uint64_t* jobId);
 
   // executes the handler directly or add it to the queue
-  bool handleRequest(HttpCommTask*, arangodb::WorkItem::uptr<RestHandler>&);
+  bool handleRequest(GeneralCommTask*, arangodb::WorkItem::uptr<RestHandler>&);
 
  protected:
   // Handler, Job, and Task tuple
   struct handler_task_job_t {
     RestHandler* _handler;
-    HttpCommTask* _task;
+    GeneralCommTask* _task;
     HttpServerJob* _job;
   };
 
@@ -125,10 +125,10 @@ class GeneralServer : protected TaskManager {
   bool openEndpoint(Endpoint* endpoint);
 
   // handle request directly
-  void handleRequestDirectly(RestHandler* handler, HttpCommTask* task);
+  void handleRequestDirectly(RestHandler* handler, GeneralCommTask* task);
 
   // registers a task
-  void registerHandler(RestHandler* handler, HttpCommTask* task);
+  void registerHandler(RestHandler* handler, GeneralCommTask* task);
 
  protected:
   // active listen tasks
@@ -141,7 +141,7 @@ class GeneralServer : protected TaskManager {
   arangodb::Mutex _commTasksLock;
 
   // active comm tasks
-  std::unordered_set<HttpCommTask*> _commTasks;
+  std::unordered_set<GeneralCommTask*> _commTasks;
 
   // keep-alive timeout
   double _keepAliveTimeout;

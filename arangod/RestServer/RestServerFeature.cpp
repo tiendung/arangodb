@@ -34,7 +34,7 @@
 #include "Cluster/RestShardHandler.h"
 #include "Dispatcher/DispatcherFeature.h"
 #include "GeneralServer/GeneralServer.h"
-#include "GeneralServer/HttpsServer.h"
+//#include "GeneralServer/HttpsServer.h"
 #include "GeneralServer/RestHandlerFactory.h"
 #include "ProgramOptions/Parameters.h"
 #include "ProgramOptions/ProgramOptions.h"
@@ -73,6 +73,8 @@
 #include "Ssl/SslServerFeature.h"
 #include "V8Server/V8DealerFeature.h"
 #include "VocBase/server.h"
+
+#include <stdexcept>
 
 using namespace arangodb;
 using namespace arangodb::rest;
@@ -354,26 +356,27 @@ void RestServerFeature::buildServers() {
 
   // ssl endpoints
   if (endpointList.hasSsl()) {
-    SslServerFeature* ssl =
-        application_features::ApplicationServer::getFeature<SslServerFeature>(
-            "SslServer");
+    throw std::logic_error("ssl support is not implemented");
+  //  SslServerFeature* ssl =
+  //      application_features::ApplicationServer::getFeature<SslServerFeature>(
+  //          "SslServer");
 
-    // check the ssl context
-    if (ssl->sslContext() == nullptr) {
-      LOG(FATAL) << "no ssl context is known, cannot create https server, "
-                    "please use the '--ssl.keyfile' option";
-      FATAL_ERROR_EXIT();
-    }
+  //  // check the ssl context
+  //  if (ssl->sslContext() == nullptr) {
+  //    LOG(FATAL) << "no ssl context is known, cannot create https server, "
+  //                  "please use the '--ssl.keyfile' option";
+  //    FATAL_ERROR_EXIT();
+  //  }
 
-    SSL_CTX* sslContext = ssl->sslContext();
+  //  SSL_CTX* sslContext = ssl->sslContext();
 
-    // https
-    httpServer = new HttpsServer(_keepAliveTimeout,
-                                 _allowMethodOverride,
-                                 _accessControlAllowOrigins, sslContext);
+  //  // https
+  //  httpServer = new HttpsServer(_keepAliveTimeout,
+  //                               _allowMethodOverride,
+  //                               _accessControlAllowOrigins, sslContext);
 
-    httpServer->setEndpointList(&endpointList);
-    _servers.push_back(httpServer);
+  //  httpServer->setEndpointList(&endpointList);
+  //  _servers.push_back(httpServer);
   }
 }
 

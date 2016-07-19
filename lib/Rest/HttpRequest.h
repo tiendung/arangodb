@@ -33,6 +33,7 @@ namespace arangodb {
 class RestBatchHandler;
 
 namespace rest {
+class GeneralCommTask;
 class HttpCommTask;
 }
 
@@ -43,6 +44,7 @@ struct Options;
 
 class HttpRequest : public GeneralRequest {
   friend class rest::HttpCommTask;
+  friend class rest::GeneralCommTask;
   friend class RestBatchHandler;  // TODO must be removed
 
  private:

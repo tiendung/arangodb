@@ -22,7 +22,7 @@
 /// @author Dr. Frank Celler
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "HttpCommTask.h"
+#include "GeneralCommTask.h"
 
 #include "Basics/HybridLogicalClock.h"
 #include "Basics/MutexLocker.h"
@@ -45,18 +45,18 @@ using namespace arangodb::rest;
 /// @brief static initializers
 ////////////////////////////////////////////////////////////////////////////////
 
-size_t const HttpCommTask::MaximalHeaderSize = 1 * 1024 * 1024;      //   1 MB
-size_t const HttpCommTask::MaximalBodySize = 512 * 1024 * 1024;      // 512 MB
-size_t const HttpCommTask::MaximalPipelineSize = 512 * 1024 * 1024;  // 512 MB
-size_t const HttpCommTask::RunCompactEvery = 500;
+size_t const GeneralCommTask::MaximalHeaderSize = 1 * 1024 * 1024;      //   1 MB
+size_t const GeneralCommTask::MaximalBodySize = 512 * 1024 * 1024;      // 512 MB
+size_t const GeneralCommTask::MaximalPipelineSize = 512 * 1024 * 1024;  // 512 MB
+size_t const GeneralCommTask::RunCompactEvery = 500;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief constructs a new task
 ////////////////////////////////////////////////////////////////////////////////
 
-HttpCommTask::HttpCommTask(GeneralServer* server, TRI_socket_t socket,
+GeneralCommTask::GeneralCommTask(GeneralServer* server, TRI_socket_t socket,
                            ConnectionInfo&& info, double keepAliveTimeout)
-    : Task("HttpCommTask"),
+    : Task("GeneralCommTask"),
       SocketTask(socket, keepAliveTimeout),
       _connectionInfo(std::move(info)),
       _server(server),
@@ -97,7 +97,7 @@ HttpCommTask::HttpCommTask(GeneralServer* server, TRI_socket_t socket,
 /// @brief destructs a task
 ////////////////////////////////////////////////////////////////////////////////
 
-HttpCommTask::~HttpCommTask() {
+GeneralCommTask::~GeneralCommTask() {
   LOG(TRACE) << "connection closed, client "
              << TRI_get_fd_or_handle_of_socket(_commSocket);
 
@@ -114,7 +114,7 @@ HttpCommTask::~HttpCommTask() {
   delete _request;
 }
 
-void HttpCommTask::handleResponse(HttpResponse* response) {
+void GeneralCommTask::handleResponse(HttpResponse* response) {
   _requestPending = false;
   _isChunked = false;
   _startThread = false;
@@ -126,14 +126,14 @@ void HttpCommTask::handleResponse(HttpResponse* response) {
   }
 }
 
-void HttpCommTask::handleSimpleError(GeneralResponse::ResponseCode code) {
+void GeneralCommTask::handleSimpleError(GeneralResponse::ResponseCode code) {
   HttpResponse response(code);
 
   resetState(true);
   addResponse(&response);
 }
 
-void HttpCommTask::handleSimpleError(GeneralResponse::ResponseCode responseCode,
+void GeneralCommTask::handleSimpleError(GeneralResponse::ResponseCode responseCode,
                                      int errorNum,
                                      std::string const& errorMessage) {
   HttpResponse response(responseCode);
@@ -157,7 +157,7 @@ void HttpCommTask::handleSimpleError(GeneralResponse::ResponseCode responseCode,
   }
 }
 
-GeneralResponse::ResponseCode HttpCommTask::authenticateRequest() {
+GeneralResponse::ResponseCode GeneralCommTask::authenticateRequest() {
   auto context = (_request == nullptr) ? nullptr : _request->requestContext();
 
   if (context == nullptr && _request != nullptr) {
@@ -181,7 +181,7 @@ GeneralResponse::ResponseCode HttpCommTask::authenticateRequest() {
 /// @brief reads data from the socket
 ////////////////////////////////////////////////////////////////////////////////
 
-bool HttpCommTask::processRead() {
+bool GeneralCommTask::processRead() {
   if (_requestPending || _readBuffer->c_str() == nullptr) {
     return false;
   }
@@ -561,7 +561,7 @@ bool HttpCommTask::processRead() {
 /// @brief sends more chunked data
 ////////////////////////////////////////////////////////////////////////////////
 
-void HttpCommTask::sendChunk(StringBuffer* buffer) {
+void GeneralCommTask::sendChunk(StringBuffer* buffer) {
   if (_isChunked) {
     TRI_ASSERT(buffer != nullptr);
 
@@ -578,7 +578,7 @@ void HttpCommTask::sendChunk(StringBuffer* buffer) {
 /// @brief chunking is finished
 ////////////////////////////////////////////////////////////////////////////////
 
-void HttpCommTask::finishedChunked() {
+void GeneralCommTask::finishedChunked() {
   auto buffer = std::make_unique<StringBuffer>(TRI_UNKNOWN_MEM_ZONE, 6, true);
   buffer->appendText(TRI_CHAR_LENGTH_PAIR("0\r\n\r\n"));
   buffer->ensureNullTerminated();
@@ -599,7 +599,7 @@ void HttpCommTask::finishedChunked() {
 /// @brief task set up complete
 ////////////////////////////////////////////////////////////////////////////////
 
-void HttpCommTask::setupDone() {
+void GeneralCommTask::setupDone() {
   _setupDone.store(true, std::memory_order_relaxed);
 }
 
@@ -607,7 +607,7 @@ void HttpCommTask::setupDone() {
 /// @brief reads data from the socket
 ////////////////////////////////////////////////////////////////////////////////
 
-void HttpCommTask::addResponse(HttpResponse* response) {
+void GeneralCommTask::addResponse(HttpResponse* response) {
   // CORS response handling
   if (!_origin.empty()) {
     // the request contained an Origin header. We have to send back the
@@ -706,7 +706,7 @@ void HttpCommTask::addResponse(HttpResponse* response) {
 /// check the content-length header of a request and fail it is broken
 ////////////////////////////////////////////////////////////////////////////////
 
-bool HttpCommTask::checkContentLength(bool expectContentLength) {
+bool GeneralCommTask::checkContentLength(bool expectContentLength) {
   int64_t const bodyLength = _request->contentLength();
 
   if (bodyLength < 0) {
@@ -749,7 +749,7 @@ bool HttpCommTask::checkContentLength(bool expectContentLength) {
 /// @brief fills the write buffer
 ////////////////////////////////////////////////////////////////////////////////
 
-void HttpCommTask::fillWriteBuffer() {
+void GeneralCommTask::fillWriteBuffer() {
   if (!hasWriteBuffer() && !_writeBuffers.empty()) {
     StringBuffer* buffer = _writeBuffers.front();
     _writeBuffers.pop_front();
@@ -767,7 +767,7 @@ void HttpCommTask::fillWriteBuffer() {
 /// @brief handles CORS options
 ////////////////////////////////////////////////////////////////////////////////
 
-void HttpCommTask::processCorsOptions() {
+void GeneralCommTask::processCorsOptions() {
   HttpResponse response(GeneralResponse::ResponseCode::OK);
 
   response.setHeaderNC(StaticStrings::Allow, StaticStrings::CorsMethods);
@@ -807,7 +807,7 @@ void HttpCommTask::processCorsOptions() {
 /// @brief processes a request
 ////////////////////////////////////////////////////////////////////////////////
 
-void HttpCommTask::processRequest() {
+void GeneralCommTask::processRequest() {
   // check for deflate
   bool found;
   std::string const& acceptEncoding =
@@ -927,7 +927,7 @@ void HttpCommTask::processRequest() {
 /// @brief clears the request object
 ////////////////////////////////////////////////////////////////////////////////
 
-void HttpCommTask::clearRequest() {
+void GeneralCommTask::clearRequest() {
   delete _request;
   _request = nullptr;
 }
@@ -939,7 +939,7 @@ void HttpCommTask::clearRequest() {
 /// prematurely
 ////////////////////////////////////////////////////////////////////////////////
 
-void HttpCommTask::resetState(bool close) {
+void GeneralCommTask::resetState(bool close) {
   if (close) {
     clearRequest();
 
@@ -985,7 +985,7 @@ void HttpCommTask::resetState(bool close) {
   _startThread = false;
 }
 
-bool HttpCommTask::setup(Scheduler* scheduler, EventLoop loop) {
+bool GeneralCommTask::setup(Scheduler* scheduler, EventLoop loop) {
   bool ok = SocketTask::setup(scheduler, loop);
 
   if (!ok) {
@@ -1000,9 +1000,9 @@ bool HttpCommTask::setup(Scheduler* scheduler, EventLoop loop) {
   return true;
 }
 
-void HttpCommTask::cleanup() { SocketTask::cleanup(); }
+void GeneralCommTask::cleanup() { SocketTask::cleanup(); }
 
-bool HttpCommTask::handleEvent(EventToken token, EventType events) {
+bool GeneralCommTask::handleEvent(EventToken token, EventType events) {
   bool result = SocketTask::handleEvent(token, events);
 
   if (_clientClosed) {
@@ -1012,7 +1012,7 @@ bool HttpCommTask::handleEvent(EventToken token, EventType events) {
   return result;
 }
 
-void HttpCommTask::signalTask(TaskData* data) {
+void GeneralCommTask::signalTask(TaskData* data) {
   // data response
   if (data->_type == TaskData::TASK_DATA_RESPONSE) {
     data->RequestStatisticsAgent::transferTo(this);
@@ -1064,7 +1064,7 @@ void HttpCommTask::signalTask(TaskData* data) {
   }
 }
 
-bool HttpCommTask::handleRead() {
+bool GeneralCommTask::handleRead() {
   bool res = true;
 
   if (!_setupDone.load(std::memory_order_relaxed)) {
@@ -1097,7 +1097,7 @@ bool HttpCommTask::handleRead() {
   return res;
 }
 
-void HttpCommTask::completedWriteBuffer() {
+void GeneralCommTask::completedWriteBuffer() {
   _writeBuffer = nullptr;
   _writeLength = 0;
 
@@ -1117,7 +1117,7 @@ void HttpCommTask::completedWriteBuffer() {
   }
 }
 
-void HttpCommTask::handleTimeout() {
+void GeneralCommTask::handleTimeout() {
   _clientClosed = true;
   _server->handleCommunicationClosed(this);
 }
