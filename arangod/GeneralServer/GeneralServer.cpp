@@ -169,9 +169,8 @@ void GeneralServer::stop() {
 /// @brief handles connection request
 ////////////////////////////////////////////////////////////////////////////////
 
-void GeneralServer::handleConnected(TRI_socket_t s, ConnectionInfo&& info) {
-  //FIXME
-  GeneralCommTask* task = createCommTask(s, std::move(info), ConnectionType::HTTP);
+void GeneralServer::handleConnected(TRI_socket_t s, ConnectionInfo&& info, ConnectionType connectionType) {
+  GeneralCommTask* task = createCommTask(s, std::move(info), connectionType);
 
   try {
     MUTEX_LOCKER(mutexLocker, _commTasksLock);

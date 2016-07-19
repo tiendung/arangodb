@@ -39,6 +39,6 @@ GeneralListenTask::GeneralListenTask(GeneralServer* server, Endpoint* endpoint, 
 
 bool GeneralListenTask::handleConnected(TRI_socket_t s,
                                         ConnectionInfo&& info) {
-  _server->handleConnected(s, std::move(info));
+  _server->handleConnected(s, std::move(info), _connectionType);
   return true;
 }

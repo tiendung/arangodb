@@ -96,7 +96,7 @@ class GeneralServer : protected TaskManager {
   void stop();
 
   // handles connection request
-  void handleConnected(TRI_socket_t s, ConnectionInfo&& info);
+  void handleConnected(TRI_socket_t s, ConnectionInfo&& info, ConnectionType);
 
   // handles a connection close
   void handleCommunicationClosed(GeneralCommTask*);
