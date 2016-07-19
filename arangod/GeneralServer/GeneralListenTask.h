@@ -37,16 +37,16 @@ class GeneralServer;
 /// @brief task used to establish connections
 ////////////////////////////////////////////////////////////////////////////////
 
-class HttpListenTask : public ListenTask {
-  HttpListenTask(HttpListenTask const&) = delete;
-  HttpListenTask& operator=(HttpListenTask const&) = delete;
+class GeneralListenTask : public ListenTask {
+  GeneralListenTask(GeneralListenTask const&) = delete;
+  GeneralListenTask& operator=(GeneralListenTask const&) = delete;
 
  public:
   //////////////////////////////////////////////////////////////////////////////
   /// @brief listen to given port
   //////////////////////////////////////////////////////////////////////////////
 
-  HttpListenTask(GeneralServer* server, Endpoint* endpoint);
+  GeneralListenTask(GeneralServer* server, Endpoint* endpoint);
 
  protected:
   bool handleConnected(TRI_socket_t s, ConnectionInfo&& info) override;

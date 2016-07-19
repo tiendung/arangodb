@@ -22,7 +22,7 @@
 /// @author Achim Brandt
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "HttpListenTask.h"
+#include "GeneralListenTask.h"
 
 #include "GeneralServer/GeneralServer.h"
 
@@ -33,10 +33,10 @@ using namespace arangodb::rest;
 /// @brief listen to given port
 ////////////////////////////////////////////////////////////////////////////////
 
-HttpListenTask::HttpListenTask(GeneralServer* server, Endpoint* endpoint)
-    : Task("HttpListenTask"), ListenTask(endpoint), _server(server) {}
+GeneralListenTask::GeneralListenTask(GeneralServer* server, Endpoint* endpoint)
+    : Task("GeneralListenTask"), ListenTask(endpoint), _server(server) {}
 
-bool HttpListenTask::handleConnected(TRI_socket_t s,
+bool GeneralListenTask::handleConnected(TRI_socket_t s,
                                      ConnectionInfo&& info) {
   _server->handleConnected(s, std::move(info));
   return true;

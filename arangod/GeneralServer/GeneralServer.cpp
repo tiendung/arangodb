@@ -31,7 +31,7 @@
 #include "Endpoint/EndpointList.h"
 #include "GeneralServer/AsyncJobManager.h"
 #include "GeneralServer/HttpCommTask.h"
-#include "GeneralServer/HttpListenTask.h"
+#include "GeneralServer/GeneralListenTask.h"
 #include "GeneralServer/HttpServerJob.h"
 #include "GeneralServer/RestHandler.h"
 #include "Logger/Logger.h"
@@ -90,9 +90,8 @@ HttpCommTask* GeneralServer::createCommTask(TRI_socket_t s,
                                             ConnectionType conntype) {
   switch (conntype) {
     case ConnectionType::VSTREAM:
-      //fixme
       return new HttpCommTask(this, s, std::move(info), _keepAliveTimeout);
-    case ConnectionType::HTTP:
+    default:
       return new HttpCommTask(this, s, std::move(info), _keepAliveTimeout);
   }
 }
@@ -286,7 +285,7 @@ bool GeneralServer::handleRequest(HttpCommTask* task,
 ////////////////////////////////////////////////////////////////////////////////
 
 bool GeneralServer::openEndpoint(Endpoint* endpoint) {
-  ListenTask* task = new HttpListenTask(this, endpoint);
+  ListenTask* task = new GeneralListenTask(this, endpoint);
 
   // ...................................................................
   // For some reason we have failed in our endeavor to bind to the socket -
