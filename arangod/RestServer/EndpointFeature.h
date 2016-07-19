@@ -31,7 +31,7 @@
 
 namespace arangodb {
 namespace rest {
-class HttpServer;
+class GeneralServer;
 class HttpsServer;
 }
 

@@ -45,19 +45,19 @@ class Job;
 class ListenTask;
 class RestHandlerFactory;
 
-class HttpServer : protected TaskManager {
-  HttpServer(HttpServer const&) = delete;
-  HttpServer const& operator=(HttpServer const&) = delete;
+class GeneralServer : protected TaskManager {
+  GeneralServer(GeneralServer const&) = delete;
+  GeneralServer const& operator=(GeneralServer const&) = delete;
 
  public:
   // destroys an endpoint server
   static int sendChunk(uint64_t, std::string const&);
 
  public:
-  HttpServer(double keepAliveTimeout,
-             bool allowMethodOverride, 
+  GeneralServer(double keepAliveTimeout,
+             bool allowMethodOverride,
              std::vector<std::string> const& accessControlAllowOrigins);
-  virtual ~HttpServer();
+  virtual ~GeneralServer();
 
  public:
   // returns the protocol
@@ -77,8 +77,8 @@ class HttpServer : protected TaskManager {
   virtual HttpCommTask* createCommTask(TRI_socket_t, ConnectionInfo&&);
 
  public:
-  // list of trusted origin urls for CORS 
-  std::vector<std::string> const& trustedOrigins() const { 
+  // list of trusted origin urls for CORS
+  std::vector<std::string> const& trustedOrigins() const {
     return _accessControlAllowOrigins;
   }
 
@@ -146,8 +146,8 @@ class HttpServer : protected TaskManager {
 
   // allow to override the method
   bool _allowMethodOverride;
-  
-  // list of trusted origin urls for CORS 
+
+  // list of trusted origin urls for CORS
   std::vector<std::string> const _accessControlAllowOrigins;
 };
 }

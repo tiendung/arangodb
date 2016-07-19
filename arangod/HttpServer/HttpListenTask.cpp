@@ -33,7 +33,7 @@ using namespace arangodb::rest;
 /// @brief listen to given port
 ////////////////////////////////////////////////////////////////////////////////
 
-HttpListenTask::HttpListenTask(HttpServer* server, Endpoint* endpoint)
+HttpListenTask::HttpListenTask(GeneralServer* server, Endpoint* endpoint)
     : Task("HttpListenTask"), ListenTask(endpoint), _server(server) {}
 
 bool HttpListenTask::handleConnected(TRI_socket_t s,

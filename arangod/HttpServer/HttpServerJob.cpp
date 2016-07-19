@@ -42,7 +42,7 @@ using namespace arangodb::rest;
 /// @brief constructs a new server job
 ////////////////////////////////////////////////////////////////////////////////
 
-HttpServerJob::HttpServerJob(HttpServer* server,
+HttpServerJob::HttpServerJob(GeneralServer* server,
                              WorkItem::uptr<RestHandler>& handler, bool isAsync)
     : Job("HttpServerJob"),
       _server(server),

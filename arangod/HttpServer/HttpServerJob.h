@@ -33,14 +33,14 @@
 namespace arangodb {
 namespace rest {
 class RestHandler;
-class HttpServer;
+class GeneralServer;
 
 class HttpServerJob : public Job {
   HttpServerJob(HttpServerJob const&) = delete;
   HttpServerJob& operator=(HttpServerJob const&) = delete;
 
  public:
-  HttpServerJob(HttpServer*, arangodb::WorkItem::uptr<RestHandler>&,
+  HttpServerJob(GeneralServer*, arangodb::WorkItem::uptr<RestHandler>&,
                 bool isAsync = false);
 
   ~HttpServerJob();
@@ -56,7 +56,7 @@ class HttpServerJob : public Job {
   void handleError(basics::Exception const&) override;
 
  protected:
-  HttpServer* _server;
+  GeneralServer* _server;
   arangodb::WorkItem::uptr<RestHandler> _handler;
   arangodb::WorkDescription* _workDesc;
   bool _isAsync;

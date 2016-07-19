@@ -54,7 +54,7 @@ size_t const HttpCommTask::RunCompactEvery = 500;
 /// @brief constructs a new task
 ////////////////////////////////////////////////////////////////////////////////
 
-HttpCommTask::HttpCommTask(HttpServer* server, TRI_socket_t socket,
+HttpCommTask::HttpCommTask(GeneralServer* server, TRI_socket_t socket,
                            ConnectionInfo&& info, double keepAliveTimeout)
     : Task("HttpCommTask"),
       SocketTask(socket, keepAliveTimeout),

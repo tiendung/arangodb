@@ -38,7 +38,7 @@ class HttpRequest;
 class HttpResponse;
 
 namespace rest {
-class HttpServer;
+class GeneralServer;
 
 class HttpCommTask : public SocketTask, public RequestStatisticsAgent {
   HttpCommTask(HttpCommTask const&) = delete;
@@ -51,7 +51,7 @@ class HttpCommTask : public SocketTask, public RequestStatisticsAgent {
   static size_t const RunCompactEvery;
 
  public:
-  HttpCommTask(HttpServer*, TRI_socket_t, ConnectionInfo&&,
+  HttpCommTask(GeneralServer*, TRI_socket_t, ConnectionInfo&&,
                double keepAliveTimeout);
 
  protected:
@@ -128,7 +128,7 @@ class HttpCommTask : public SocketTask, public RequestStatisticsAgent {
   ConnectionInfo _connectionInfo;
 
   // the underlying server
-  HttpServer* const _server;
+  GeneralServer* const _server;
 
   // allow method override
   bool _allowMethodOverride;
@@ -169,7 +169,7 @@ class HttpCommTask : public SocketTask, public RequestStatisticsAgent {
 
   // true if within a chunked response
   bool _isChunked;
-  
+
   //////////////////////////////////////////////////////////////////////////////
   /// @brief start a separate thread if the task is added to the dispatcher?
   //////////////////////////////////////////////////////////////////////////////

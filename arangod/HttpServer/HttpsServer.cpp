@@ -35,7 +35,7 @@ using namespace arangodb::rest;
 HttpsServer::HttpsServer(
     double keepAliveTimeout, bool allowMethodOverride,
     std::vector<std::string> const& accessControlAllowOrigins, SSL_CTX* ctx)
-    : HttpServer(keepAliveTimeout, allowMethodOverride,
+    : GeneralServer(keepAliveTimeout, allowMethodOverride,
                  accessControlAllowOrigins),
       _ctx(ctx),
       _verificationMode(SSL_VERIFY_NONE),

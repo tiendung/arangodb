@@ -31,7 +31,7 @@ namespace arangodb {
 class Endpoint;
 
 namespace rest {
-class HttpServer;
+class GeneralServer;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief task used to establish connections
@@ -46,7 +46,7 @@ class HttpListenTask : public ListenTask {
   /// @brief listen to given port
   //////////////////////////////////////////////////////////////////////////////
 
-  HttpListenTask(HttpServer* server, Endpoint* endpoint);
+  HttpListenTask(GeneralServer* server, Endpoint* endpoint);
 
  protected:
   bool handleConnected(TRI_socket_t s, ConnectionInfo&& info) override;
@@ -56,7 +56,7 @@ class HttpListenTask : public ListenTask {
   /// @brief underlying general server
   //////////////////////////////////////////////////////////////////////////////
 
-  HttpServer* _server;
+  GeneralServer* _server;
 };
 }
 }

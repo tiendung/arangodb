@@ -31,7 +31,7 @@
 namespace arangodb {
 namespace rest {
 
-class HttpsServer : public HttpServer {
+class HttpsServer : public GeneralServer {
  public:
   HttpsServer(double keepAliveTimeout, bool allowMethodOverride,
               std::vector<std::string> const& accessControlAllowOrigins,

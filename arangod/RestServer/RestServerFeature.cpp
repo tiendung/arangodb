@@ -343,8 +343,8 @@ void RestServerFeature::buildServers() {
           "Endpoint");
 
   // unencrypted HTTP endpoints
-  HttpServer* httpServer =
-      new HttpServer(_keepAliveTimeout,
+  GeneralServer* httpServer =
+      new GeneralServer(_keepAliveTimeout,
                      _allowMethodOverride, _accessControlAllowOrigins);
 
   // YYY #warning FRANK filter list
