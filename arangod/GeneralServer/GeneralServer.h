@@ -53,6 +53,8 @@ class GeneralServer : protected TaskManager {
   // destroys an endpoint server
   static int sendChunk(uint64_t, std::string const&);
 
+  enum class ConnectionType { HTTP, VSTREAM };
+
  public:
   GeneralServer(double keepAliveTimeout,
              bool allowMethodOverride,
@@ -74,7 +76,7 @@ class GeneralServer : protected TaskManager {
   }
 
   // generates a suitable communication task
-  virtual HttpCommTask* createCommTask(TRI_socket_t, ConnectionInfo&&);
+  virtual HttpCommTask* createCommTask(TRI_socket_t, ConnectionInfo&&, ConnectionType = ConnectionType::HTTP);
 
  public:
   // list of trusted origin urls for CORS

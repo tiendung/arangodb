@@ -66,8 +66,7 @@ int GeneralServer::sendChunk(uint64_t taskId, std::string const& data) {
 ////////////////////////////////////////////////////////////////////////////////
 
 GeneralServer::GeneralServer(
-    double keepAliveTimeout,
-    bool allowMethodOverride,
+    double keepAliveTimeout, bool allowMethodOverride,
     std::vector<std::string> const& accessControlAllowOrigins)
     : _listenTasks(),
       _endpointList(nullptr),
@@ -87,8 +86,15 @@ GeneralServer::~GeneralServer() { stopListening(); }
 ////////////////////////////////////////////////////////////////////////////////
 
 HttpCommTask* GeneralServer::createCommTask(TRI_socket_t s,
-                                         ConnectionInfo&& info) {
-  return new HttpCommTask(this, s, std::move(info), _keepAliveTimeout);
+                                            ConnectionInfo&& info,
+                                            ConnectionType conntype) {
+  switch (conntype) {
+    case ConnectionType::VSTREAM:
+      //fixme
+      return new HttpCommTask(this, s, std::move(info), _keepAliveTimeout);
+    case ConnectionType::HTTP:
+      return new HttpCommTask(this, s, std::move(info), _keepAliveTimeout);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -118,7 +124,8 @@ void GeneralServer::startListening() {
     } else {
       LOG(FATAL) << "failed to bind to endpoint '" << it.first
                  << "'. Please check whether another instance is already "
-                    "running using this endpoint and review your endpoints configuration.";
+                    "running using this endpoint and review your endpoints "
+                    "configuration.";
       FATAL_ERROR_EXIT();
     }
   }
@@ -203,8 +210,8 @@ void GeneralServer::handleCommunicationFailure(HttpCommTask* task) {
 ////////////////////////////////////////////////////////////////////////////////
 
 bool GeneralServer::handleRequestAsync(HttpCommTask* task,
-                                    WorkItem::uptr<RestHandler>& handler,
-                                    uint64_t* jobId) {
+                                       WorkItem::uptr<RestHandler>& handler,
+                                       uint64_t* jobId) {
   bool startThread = task->startThread();
 
   // extract the coordinator flag
@@ -249,7 +256,7 @@ bool GeneralServer::handleRequestAsync(HttpCommTask* task,
 ////////////////////////////////////////////////////////////////////////////////
 
 bool GeneralServer::handleRequest(HttpCommTask* task,
-                               WorkItem::uptr<RestHandler>& handler) {
+                                  WorkItem::uptr<RestHandler>& handler) {
   // direct handlers
   if (handler->isDirect()) {
     HandlerWorkStack work(handler);
@@ -306,7 +313,7 @@ bool GeneralServer::openEndpoint(Endpoint* endpoint) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void GeneralServer::handleRequestDirectly(RestHandler* handler,
-                                       HttpCommTask* task) {
+                                          HttpCommTask* task) {
   task->RequestStatisticsAgent::transferTo(handler);
   RestHandler::status result = handler->executeFull();
   handler->RequestStatisticsAgent::transferTo(task);

@@ -52,7 +52,7 @@ class HttpsServer : public GeneralServer {
     return Endpoint::EncryptionType::SSL;
   }
 
-  HttpCommTask* createCommTask(TRI_socket_t, ConnectionInfo&&) override;
+  HttpCommTask* createCommTask(TRI_socket_t, ConnectionInfo&&, ConnectionType) override;
 
  private:
   SSL_CTX* _ctx;

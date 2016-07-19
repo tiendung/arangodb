@@ -61,7 +61,7 @@ void HttpsServer::setVerificationCallback(int (*func)(int, X509_STORE_CTX*)) {
 }
 
 HttpCommTask* HttpsServer::createCommTask(TRI_socket_t s,
-                                          ConnectionInfo&& info) {
+                                          ConnectionInfo&& info, ConnectionType) {
   return new HttpsCommTask(this, s, std::move(info), _keepAliveTimeout, _ctx,
                            _verificationMode, _verificationCallback);
 }
