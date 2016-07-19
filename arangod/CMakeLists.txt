@@ -187,7 +187,7 @@ add_executable(${BIN_ARANGOD}
   GeoIndex/GeoIndex.cpp
   GeneralServer/AsyncJobManager.cpp
   GeneralServer/HttpCommTask.cpp
-  GeneralServer/HttpListenTask.cpp
+  GeneralServer/GeneralListenTask.cpp
   GeneralServer/GeneralServer.cpp
   GeneralServer/HttpServerJob.cpp
   GeneralServer/HttpsCommTask.cpp
