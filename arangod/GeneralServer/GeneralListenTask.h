@@ -26,6 +26,7 @@
 #define ARANGOD_HTTP_SERVER_HTTP_LISTEN_TASK_H 1
 
 #include "Scheduler/ListenTask.h"
+#include "GeneralServer/GeneralDefinitions.h"
 
 namespace arangodb {
 class Endpoint;
@@ -46,7 +47,7 @@ class GeneralListenTask : public ListenTask {
   /// @brief listen to given port
   //////////////////////////////////////////////////////////////////////////////
 
-  GeneralListenTask(GeneralServer* server, Endpoint* endpoint);
+  GeneralListenTask(GeneralServer* server, Endpoint* endpoint, ConnectionType connectionType);
 
  protected:
   bool handleConnected(TRI_socket_t s, ConnectionInfo&& info) override;
@@ -57,6 +58,7 @@ class GeneralListenTask : public ListenTask {
   //////////////////////////////////////////////////////////////////////////////
 
   GeneralServer* _server;
+  ConnectionType _connectionType;
 };
 }
 }

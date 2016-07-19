@@ -90,9 +90,9 @@ GeneralCommTask* GeneralServer::createCommTask(TRI_socket_t s,
                                             ConnectionType conntype) {
   switch (conntype) {
     case ConnectionType::VSTREAM:
-      return new GeneralCommTask(this, s, std::move(info), _keepAliveTimeout);
+      return new HttpCommTask(this, s, std::move(info), _keepAliveTimeout);
     default:
-      return new GeneralCommTask(this, s, std::move(info), _keepAliveTimeout);
+      return new HttpCommTask(this, s, std::move(info), _keepAliveTimeout);
   }
 }
 
@@ -170,7 +170,8 @@ void GeneralServer::stop() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void GeneralServer::handleConnected(TRI_socket_t s, ConnectionInfo&& info) {
-  GeneralCommTask* task = createCommTask(s, std::move(info));
+  //FIXME
+  GeneralCommTask* task = createCommTask(s, std::move(info), ConnectionType::HTTP);
 
   try {
     MUTEX_LOCKER(mutexLocker, _commTasksLock);
@@ -285,7 +286,7 @@ bool GeneralServer::handleRequest(GeneralCommTask* task,
 ////////////////////////////////////////////////////////////////////////////////
 
 bool GeneralServer::openEndpoint(Endpoint* endpoint) {
-  ListenTask* task = new GeneralListenTask(this, endpoint);
+  ListenTask* task = new GeneralListenTask(this, endpoint, ConnectionType::HTTP);
 
   // ...................................................................
   // For some reason we have failed in our endeavor to bind to the socket -

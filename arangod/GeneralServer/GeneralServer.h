@@ -26,6 +26,7 @@
 #ifndef ARANGOD_HTTP_SERVER_HTTP_SERVER_H
 #define ARANGOD_HTTP_SERVER_HTTP_SERVER_H 1
 
+#include "GeneralServer/GeneralDefinitions.h"
 #include "Scheduler/TaskManager.h"
 
 #include "Basics/Mutex.h"
@@ -52,8 +53,6 @@ class GeneralServer : protected TaskManager {
  public:
   // destroys an endpoint server
   static int sendChunk(uint64_t, std::string const&);
-
-  enum class ConnectionType { HTTP, VSTREAM };
 
  public:
   GeneralServer(double keepAliveTimeout,

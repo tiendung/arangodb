@@ -55,7 +55,7 @@ class GeneralCommTask : public SocketTask, public RequestStatisticsAgent {
                double keepAliveTimeout);
 
  protected:
-  virtual ~GeneralCommTask();
+  ~GeneralCommTask();
 
  public:
   // return whether or not the task desires to start a dispatcher thread
@@ -208,8 +208,9 @@ class GeneralCommTask : public SocketTask, public RequestStatisticsAgent {
 }; //Commontask
 
 class HttpCommTask : public GeneralCommTask {
-  template<typename... Args>
-      HttpCommTask( Args&&... args ) : GeneralCommTask(std::forward<Args>(args)...){};
+  public:
+  HttpCommTask(GeneralServer* serv, TRI_socket_t sock, ConnectionInfo&& info, double timeout)
+    :GeneralCommTask(serv,sock,std::move(info),timeout), Task("HttpCommTask"){}
 };
 
 

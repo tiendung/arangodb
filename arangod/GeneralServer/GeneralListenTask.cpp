@@ -26,6 +26,7 @@
 
 #include "GeneralServer/GeneralServer.h"
 
+
 using namespace arangodb;
 using namespace arangodb::rest;
 
@@ -33,11 +34,11 @@ using namespace arangodb::rest;
 /// @brief listen to given port
 ////////////////////////////////////////////////////////////////////////////////
 
-GeneralListenTask::GeneralListenTask(GeneralServer* server, Endpoint* endpoint)
-    : Task("GeneralListenTask"), ListenTask(endpoint), _server(server) {}
+GeneralListenTask::GeneralListenTask(GeneralServer* server, Endpoint* endpoint, ConnectionType connectionType)
+    : Task("GeneralListenTask"), ListenTask(endpoint), _server(server), _connectionType(connectionType) {}
 
 bool GeneralListenTask::handleConnected(TRI_socket_t s,
-                                     ConnectionInfo&& info) {
+                                        ConnectionInfo&& info) {
   _server->handleConnected(s, std::move(info));
   return true;
 }
