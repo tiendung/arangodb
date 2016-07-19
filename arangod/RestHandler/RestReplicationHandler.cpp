@@ -29,7 +29,7 @@
 #include "Basics/files.h"
 #include "Cluster/ClusterComm.h"
 #include "Cluster/ClusterMethods.h"
-#include "HttpServer/HttpServer.h"
+#include "GeneralServer/GeneralServer.h"
 #include "Indexes/EdgeIndex.h"
 #include "Indexes/Index.h"
 #include "Indexes/PrimaryIndex.h"

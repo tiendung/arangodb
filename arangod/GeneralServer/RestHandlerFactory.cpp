@@ -24,7 +24,7 @@
 #include "RestHandlerFactory.h"
 
 #include "Cluster/ServerState.h"
-#include "HttpServer/RestHandler.h"
+#include "GeneralServer/RestHandler.h"
 #include "Logger/Logger.h"
 #include "Rest/GeneralRequest.h"
 #include "Rest/RequestContext.h"

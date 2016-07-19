@@ -35,7 +35,7 @@
 #include "Basics/tri-strings.h"
 #include "Cluster/ClusterComm.h"
 #include "Cluster/ServerState.h"
-#include "HttpServer/HttpServer.h"
+#include "GeneralServer/GeneralServer.h"
 #include "Logger/Logger.h"
 #include "Rest/GeneralRequest.h"
 #include "Rest/HttpRequest.h"

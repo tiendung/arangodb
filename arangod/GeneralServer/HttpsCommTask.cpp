@@ -28,7 +28,7 @@
 
 #include "Basics/StringBuffer.h"
 #include "Basics/socket-utils.h"
-#include "HttpServer/HttpsServer.h"
+#include "GeneralServer/HttpsServer.h"
 #include "Logger/Logger.h"
 #include "Scheduler/Scheduler.h"
 #include "Ssl/ssl-helper.h"

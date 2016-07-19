@@ -24,7 +24,7 @@
 
 #include "HttpListenTask.h"
 
-#include "HttpServer/HttpServer.h"
+#include "GeneralServer/GeneralServer.h"
 
 using namespace arangodb;
 using namespace arangodb::rest;

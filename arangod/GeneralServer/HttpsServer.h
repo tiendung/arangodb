@@ -24,7 +24,7 @@
 #ifndef ARANGOD_HTTP_SERVER_HTTPS_SERVER_H
 #define ARANGOD_HTTP_SERVER_HTTPS_SERVER_H 1
 
-#include "HttpServer/HttpServer.h"
+#include "GeneralServer/GeneralServer.h"
 
 #include <openssl/ssl.h>
 

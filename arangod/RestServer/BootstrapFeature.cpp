@@ -26,7 +26,7 @@
 #include "Cluster/AgencyComm.h"
 #include "Cluster/ClusterInfo.h"
 #include "Cluster/ServerState.h"
-#include "HttpServer/RestHandlerFactory.h"
+#include "GeneralServer/RestHandlerFactory.h"
 #include "Logger/Logger.h"
 #include "ProgramOptions/Parameters.h"
 #include "ProgramOptions/ProgramOptions.h"
@@ -68,7 +68,7 @@ static void raceForClusterBootstrap() {
     AgencyCommResult result = agency.getValues("Bootstrap");
     if (!result.successful()) {
       // Error in communication, note that value not found is not an error
-      LOG_TOPIC(TRACE, Logger::STARTUP) 
+      LOG_TOPIC(TRACE, Logger::STARTUP)
           << "raceForClusterBootstrap: no agency communication";
       sleep(1);
       continue;
@@ -79,11 +79,11 @@ static void raceForClusterBootstrap() {
       // key was found and is a string
       if (value.isEqualString("done")) {
         // all done, let's get out of here:
-        LOG_TOPIC(TRACE, Logger::STARTUP) 
+        LOG_TOPIC(TRACE, Logger::STARTUP)
             << "raceForClusterBootstrap: bootstrap already done";
         return;
       }
-      LOG_TOPIC(DEBUG, Logger::STARTUP) 
+      LOG_TOPIC(DEBUG, Logger::STARTUP)
           << "raceForClusterBootstrap: somebody else does the bootstrap";
       sleep(1);
       continue;
@@ -94,7 +94,7 @@ static void raceForClusterBootstrap() {
     b.add(VPackValue(arangodb::ServerState::instance()->getId()));
     result = agency.casValue("Bootstrap", b.slice(), false, 300, 15);
     if (!result.successful()) {
-      LOG_TOPIC(DEBUG, Logger::STARTUP) 
+      LOG_TOPIC(DEBUG, Logger::STARTUP)
           << "raceForClusterBootstrap: lost race, somebody else will bootstrap";
       // Cannot get foot into the door, try again later:
       sleep(1);
@@ -104,19 +104,19 @@ static void raceForClusterBootstrap() {
     // OK, we handle things now, let's see whether a DBserver is there:
     auto dbservers = ci->getCurrentDBServers();
     if (dbservers.size() == 0) {
-      LOG_TOPIC(TRACE, Logger::STARTUP) 
+      LOG_TOPIC(TRACE, Logger::STARTUP)
           << "raceForClusterBootstrap: no DBservers, waiting";
       agency.removeValues("Bootstrap", false);
       sleep(1);
       continue;
     }
 
-    LOG_TOPIC(DEBUG, Logger::STARTUP) 
+    LOG_TOPIC(DEBUG, Logger::STARTUP)
         << "raceForClusterBootstrap: race won, we do the bootstrap";
     auto vocbase = DatabaseFeature::DATABASE->vocbase();
     V8DealerFeature::DEALER->loadJavascriptFiles(vocbase, "server/bootstrap/cluster-bootstrap.js", 0);
 
-    LOG_TOPIC(DEBUG, Logger::STARTUP) 
+    LOG_TOPIC(DEBUG, Logger::STARTUP)
         << "raceForClusterBootstrap: bootstrap done";
 
     b.clear();
@@ -126,7 +126,7 @@ static void raceForClusterBootstrap() {
       return;
     }
 
-    LOG_TOPIC(TRACE, Logger::STARTUP) 
+    LOG_TOPIC(TRACE, Logger::STARTUP)
         << "raceForClusterBootstrap: could not indicate success";
 
     sleep(1);
@@ -165,7 +165,7 @@ void BootstrapFeature::start() {
 void BootstrapFeature::unprepare() {
   auto server = ApplicationServer::getFeature<DatabaseServerFeature>("DatabaseServer");
 
-  TRI_server_t* s = server->SERVER; 
+  TRI_server_t* s = server->SERVER;
 
   // notify all currently running queries about the shutdown
   if (ServerState::instance()->isCoordinator()) {
@@ -177,7 +177,7 @@ void BootstrapFeature::unprepare() {
         vocbase->_queries->killAll(true);
         TRI_ReleaseVocBase(vocbase);
       }
-    } 
+    }
   } else {
     std::vector<std::string> names;
     int res = TRI_GetDatabaseNamesServer(s, names);

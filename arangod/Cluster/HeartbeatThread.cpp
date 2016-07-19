@@ -39,7 +39,7 @@
 #include "Dispatcher/Dispatcher.h"
 #include "Dispatcher/DispatcherFeature.h"
 #include "Dispatcher/Job.h"
-#include "HttpServer/RestHandlerFactory.h"
+#include "GeneralServer/RestHandlerFactory.h"
 #include "Logger/Logger.h"
 #include "RestServer/RestServerFeature.h"
 #include "V8/v8-globals.h"
@@ -610,14 +610,14 @@ bool HeartbeatThread::syncDBServerStatusQuo() {
     if (becauseOfCurrent) {
       ci->invalidateCurrent();
     }
-    
+
     // only warn if the application server is still there and dispatching
     // should succeed
     bool warn = false;
     application_features::ApplicationServer* server = application_features::ApplicationServer::server;
     if (server != nullptr) {
       auto state = server->state();
-      warn = (state != application_features::ServerState::IN_STOP && 
+      warn = (state != application_features::ServerState::IN_STOP &&
               state != application_features::ServerState::IN_UNPREPARE &&
               state != application_features::ServerState::STOPPED &&
               state != application_features::ServerState::ABORT);

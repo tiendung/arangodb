@@ -22,18 +22,18 @@
 /// @author Achim Brandt
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "HttpServer.h"
+#include "GeneralServer.h"
 
 #include "Basics/MutexLocker.h"
 #include "Basics/WorkMonitor.h"
 #include "Dispatcher/Dispatcher.h"
 #include "Dispatcher/DispatcherFeature.h"
 #include "Endpoint/EndpointList.h"
-#include "HttpServer/AsyncJobManager.h"
-#include "HttpServer/HttpCommTask.h"
-#include "HttpServer/HttpListenTask.h"
-#include "HttpServer/HttpServerJob.h"
-#include "HttpServer/RestHandler.h"
+#include "GeneralServer/AsyncJobManager.h"
+#include "GeneralServer/HttpCommTask.h"
+#include "GeneralServer/HttpListenTask.h"
+#include "GeneralServer/HttpServerJob.h"
+#include "GeneralServer/RestHandler.h"
 #include "Logger/Logger.h"
 #include "RestServer/RestServerFeature.h"
 #include "Scheduler/ListenTask.h"

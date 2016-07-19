@@ -23,7 +23,7 @@
 
 #include "HttpsServer.h"
 
-#include "HttpServer/HttpsCommTask.h"
+#include "GeneralServer/HttpsCommTask.h"
 
 using namespace arangodb;
 using namespace arangodb::rest;

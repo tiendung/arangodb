@@ -30,7 +30,7 @@
 
 #include "Basics/Mutex.h"
 #include "Endpoint/ConnectionInfo.h"
-#include "HttpServer/RestHandler.h"
+#include "GeneralServer/RestHandler.h"
 
 namespace arangodb {
 class EndpointList;

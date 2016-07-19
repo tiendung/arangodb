@@ -185,16 +185,16 @@ add_executable(${BIN_ARANGOD}
   FulltextIndex/fulltext-query.cpp
   FulltextIndex/fulltext-result.cpp
   GeoIndex/GeoIndex.cpp
-  HttpServer/AsyncJobManager.cpp
-  HttpServer/HttpCommTask.cpp
-  HttpServer/HttpListenTask.cpp
-  HttpServer/HttpServer.cpp
-  HttpServer/HttpServerJob.cpp
-  HttpServer/HttpsCommTask.cpp
-  HttpServer/HttpsServer.cpp
-  HttpServer/RestHandler.cpp
-  HttpServer/RestHandlerFactory.cpp
-  HttpServer/PathHandler.cpp
+  GeneralServer/AsyncJobManager.cpp
+  GeneralServer/HttpCommTask.cpp
+  GeneralServer/HttpListenTask.cpp
+  GeneralServer/GeneralServer.cpp
+  GeneralServer/HttpServerJob.cpp
+  GeneralServer/HttpsCommTask.cpp
+  GeneralServer/HttpsServer.cpp
+  GeneralServer/RestHandler.cpp
+  GeneralServer/RestHandlerFactory.cpp
+  GeneralServer/PathHandler.cpp
   Indexes/EdgeIndex.cpp
   Indexes/FulltextIndex.cpp
   Indexes/GeoIndex2.cpp
