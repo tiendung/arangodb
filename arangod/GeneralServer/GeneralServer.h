@@ -55,27 +55,20 @@ class GeneralServer : protected TaskManager {
   static int sendChunk(uint64_t, std::string const&);
 
  public:
-  GeneralServer(double keepAliveTimeout,
-             bool allowMethodOverride,
-             std::vector<std::string> const& accessControlAllowOrigins);
+  GeneralServer(double keepAliveTimeout, bool allowMethodOverride,
+                std::vector<std::string> const& accessControlAllowOrigins);
   virtual ~GeneralServer();
 
  public:
   // returns the protocol
   virtual char const* protocol() const { return "http"; }
 
-  // returns the encryption to be used
-  virtual Endpoint::EncryptionType encryptionType() const {
-    return Endpoint::EncryptionType::NONE;
-  }
-
   // check, if we allow a method override
-  bool allowMethodOverride() {
-    return _allowMethodOverride;
-  }
+  bool allowMethodOverride() { return _allowMethodOverride; }
 
   // generates a suitable communication task
-  virtual GeneralCommTask* createCommTask(TRI_socket_t, ConnectionInfo&&, ConnectionType = ConnectionType::HTTP);
+  virtual GeneralCommTask* createCommTask(
+      TRI_socket_t, ConnectionInfo&&, ConnectionType = ConnectionType::HTTP);
 
  public:
   // list of trusted origin urls for CORS
@@ -105,7 +98,8 @@ class GeneralServer : protected TaskManager {
   void handleCommunicationFailure(GeneralCommTask*);
 
   // creates a job for asynchronous execution
-  bool handleRequestAsync(GeneralCommTask*, arangodb::WorkItem::uptr<RestHandler>&,
+  bool handleRequestAsync(GeneralCommTask*,
+                          arangodb::WorkItem::uptr<RestHandler>&,
                           uint64_t* jobId);
 
   // executes the handler directly or add it to the queue

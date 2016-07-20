@@ -86,10 +86,14 @@ GeneralServer::~GeneralServer() { stopListening(); }
 ////////////////////////////////////////////////////////////////////////////////
 
 GeneralCommTask* GeneralServer::createCommTask(TRI_socket_t s,
-                                            ConnectionInfo&& info,
-                                            ConnectionType conntype) {
+                                               ConnectionInfo&& info,
+                                               ConnectionType conntype) {
   switch (conntype) {
-    case ConnectionType::VSTREAM:
+    case ConnectionType::VPPS:
+      return new HttpCommTask(this, s, std::move(info), _keepAliveTimeout);
+    case ConnectionType::VPP:
+      return new HttpCommTask(this, s, std::move(info), _keepAliveTimeout);
+    case ConnectionType::HTTPS:
       return new HttpCommTask(this, s, std::move(info), _keepAliveTimeout);
     default:
       return new HttpCommTask(this, s, std::move(info), _keepAliveTimeout);
@@ -109,10 +113,7 @@ void GeneralServer::setEndpointList(EndpointList const* list) {
 ////////////////////////////////////////////////////////////////////////////////
 
 void GeneralServer::startListening() {
-  auto endpoints =
-      _endpointList->matching(Endpoint::TransportType::HTTP, encryptionType());
-
-  for (auto& it : endpoints) {
+  for (auto& it : _endpointList->allEndpoints()) {
     LOG(TRACE) << "trying to bind to endpoint '" << it.first
                << "' for requests";
 
@@ -169,7 +170,8 @@ void GeneralServer::stop() {
 /// @brief handles connection request
 ////////////////////////////////////////////////////////////////////////////////
 
-void GeneralServer::handleConnected(TRI_socket_t s, ConnectionInfo&& info, ConnectionType connectionType) {
+void GeneralServer::handleConnected(TRI_socket_t s, ConnectionInfo&& info,
+                                    ConnectionType connectionType) {
   GeneralCommTask* task = createCommTask(s, std::move(info), connectionType);
 
   try {
@@ -285,7 +287,23 @@ bool GeneralServer::handleRequest(GeneralCommTask* task,
 ////////////////////////////////////////////////////////////////////////////////
 
 bool GeneralServer::openEndpoint(Endpoint* endpoint) {
-  ListenTask* task = new GeneralListenTask(this, endpoint, ConnectionType::HTTP);
+  ConnectionType connectionType;
+
+  if (endpoint->transport() == Endpoint::TransportType::HTTP) {
+    if (endpoint->encryption() == Endpoint::EncryptionType::SSL) {
+      connectionType = ConnectionType::HTTPS;
+    } else {
+      connectionType = ConnectionType::HTTP;
+    }
+  } else {
+    if (endpoint->encryption() == Endpoint::EncryptionType::SSL) {
+      connectionType = ConnectionType::VPPS;
+    } else {
+      connectionType = ConnectionType::VPP;
+    }
+  }
+
+  ListenTask* task = new GeneralListenTask(this, endpoint, connectionType);
 
   // ...................................................................
   // For some reason we have failed in our endeavor to bind to the socket -

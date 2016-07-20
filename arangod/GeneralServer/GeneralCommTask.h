@@ -52,7 +52,7 @@ class GeneralCommTask : public SocketTask, public RequestStatisticsAgent {
 
  public:
   GeneralCommTask(GeneralServer*, TRI_socket_t, ConnectionInfo&&,
-               double keepAliveTimeout);
+                  double keepAliveTimeout);
 
  protected:
   ~GeneralCommTask();
@@ -81,7 +81,7 @@ class GeneralCommTask : public SocketTask, public RequestStatisticsAgent {
   // task set up complete
   void setupDone();
 
- //private:
+  // private:
   // returns the authentication realm
   std::string authenticationRealm() const;
 
@@ -133,7 +133,7 @@ class GeneralCommTask : public SocketTask, public RequestStatisticsAgent {
   // allow method override
   bool _allowMethodOverride;
 
- //private:
+  // private:
   // write buffers
   std::deque<basics::StringBuffer*> _writeBuffers;
 
@@ -205,17 +205,17 @@ class GeneralCommTask : public SocketTask, public RequestStatisticsAgent {
 
   // authentication real
   std::string const _authenticationRealm;
-}; //Commontask
+};  // Commontask
 
 class HttpCommTask : public GeneralCommTask {
-  public:
-  HttpCommTask(GeneralServer* serv, TRI_socket_t sock, ConnectionInfo&& info, double timeout)
-    :GeneralCommTask(serv,sock,std::move(info),timeout), Task("HttpCommTask"){}
+ public:
+  HttpCommTask(GeneralServer* serv, TRI_socket_t sock, ConnectionInfo&& info,
+               double timeout)
+      : Task("HttpCommTask"),
+        GeneralCommTask(serv, sock, std::move(info), timeout) {}
 };
 
-
-
-}  //rest
-} //arango
+}  // rest
+}  // arango
 
 #endif
