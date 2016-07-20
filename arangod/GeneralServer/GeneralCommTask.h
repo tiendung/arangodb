@@ -209,17 +209,6 @@ class GeneralCommTask : public SocketTask, public RequestStatisticsAgent {
   std::string const _authenticationRealm;
 
 };  // Commontask
-
-class HttpCommTask : public GeneralCommTask {
- public:
-  HttpCommTask(GeneralServer* serv, TRI_socket_t sock, ConnectionInfo&& info,
-               double timeout)
-      : Task("HttpCommTask"),
-        GeneralCommTask(serv, sock, std::move(info), timeout) {
-    _protocol = "http";
-  }
-};
-
 }  // rest
 }  // arango
 

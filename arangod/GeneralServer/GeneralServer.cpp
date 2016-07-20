@@ -76,7 +76,7 @@ GeneralServer::GeneralServer(
       _accessControlAllowOrigins(accessControlAllowOrigins),
       _ctx(ctx),
       _verificationMode(SSL_VERIFY_NONE),
-      _verificationCallback(0),
+      _verificationCallback(nullptr),
       _sslAllowed(ctx != nullptr) {}
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief destructs a general server
@@ -97,7 +97,9 @@ GeneralCommTask* GeneralServer::createCommTask(TRI_socket_t s,
     case ConnectionType::VPP:
       return new HttpCommTask(this, s, std::move(info), _keepAliveTimeout);
     case ConnectionType::HTTPS:
-      return new HttpCommTask(this, s, std::move(info), _keepAliveTimeout);
+      // check _ctx and friends? REVIEW
+      return new HttpsCommTask(this, s, std::move(info), _keepAliveTimeout,
+                               _ctx, _verificationMode, _verificationCallback);
     default:
       return new HttpCommTask(this, s, std::move(info), _keepAliveTimeout);
   }

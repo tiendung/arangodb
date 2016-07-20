@@ -28,10 +28,11 @@
 
 #include "GeneralServer/GeneralDefinitions.h"
 #include "Scheduler/TaskManager.h"
-
 #include "Basics/Mutex.h"
 #include "Endpoint/ConnectionInfo.h"
 #include "GeneralServer/RestHandler.h"
+#include "GeneralServer/GeneralHttpTask.h"
+#include "GeneralServer/GeneralHttpsTask.h"
 #include <openssl/ssl.h>
 
 namespace arangodb {
@@ -71,6 +72,11 @@ class GeneralServer : protected TaskManager {
   // generates a suitable communication task
   virtual GeneralCommTask* createCommTask(
       TRI_socket_t, ConnectionInfo&&, ConnectionType = ConnectionType::HTTP);
+
+  void setVerificationMode(int mode) { _verificationMode = mode; }
+  void setVerificationCallback(int (*func)(int, X509_STORE_CTX*)) {
+    _verificationCallback = func;
+  }
 
  public:
   // list of trusted origin urls for CORS

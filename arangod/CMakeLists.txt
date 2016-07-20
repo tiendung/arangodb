@@ -189,6 +189,8 @@ add_executable(${BIN_ARANGOD}
   GeneralServer/HttpCommTask.cpp
   GeneralServer/HttpServerJob.cpp
   GeneralServer/GeneralCommTask.cpp
+  GeneralServer/HttpCommTask.cpp
+  GeneralServer/HttpsCommTask.cpp
   GeneralServer/GeneralListenTask.cpp
   GeneralServer/GeneralServer.cpp
   GeneralServer/RestHandler.cpp
@@ -329,8 +331,6 @@ add_executable(${BIN_ARANGOD}
   Wal/Slots.cpp
   Wal/SynchronizerThread.cpp
 )
-#GeneralServer/HttpsCommTask.cpp
-#GeneralServer/HttpsServer.cpp
 
 target_link_libraries(${BIN_ARANGOD}
   ${LIB_ARANGO_FE}
