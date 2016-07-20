@@ -81,7 +81,7 @@ class GeneralCommTask : public SocketTask, public RequestStatisticsAgent {
   // task set up complete
   void setupDone();
 
-  // private:
+ private:
   // returns the authentication realm
   std::string authenticationRealm() const;
 
@@ -133,7 +133,7 @@ class GeneralCommTask : public SocketTask, public RequestStatisticsAgent {
   // allow method override
   bool _allowMethodOverride;
 
-  // private:
+ private:
   // write buffers
   std::deque<basics::StringBuffer*> _writeBuffers;
 
