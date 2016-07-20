@@ -205,8 +205,8 @@ void RestServerFeature::validateOptions(std::shared_ptr<ProgramOptions>) {
         std::remove_if(_accessControlAllowOrigins.begin(),
                        _accessControlAllowOrigins.end(),
                        [](std::string const& value) {
-                         return basics::StringUtils::trim(value).empty();
-                       }),
+          return basics::StringUtils::trim(value).empty();
+        }),
         _accessControlAllowOrigins.end());
   }
 
@@ -345,9 +345,8 @@ void RestServerFeature::buildServers() {
           "Endpoint");
 
   // unencrypted HTTP endpoints
-  GeneralServer* httpServer =
-      new GeneralServer(_keepAliveTimeout,
-                     _allowMethodOverride, _accessControlAllowOrigins);
+  GeneralServer* httpServer = new GeneralServer(
+      _keepAliveTimeout, _allowMethodOverride, _accessControlAllowOrigins);
 
   // YYY #warning FRANK filter list
   auto const& endpointList = endpoint->endpointList();
@@ -356,27 +355,25 @@ void RestServerFeature::buildServers() {
 
   // ssl endpoints
   if (endpointList.hasSsl()) {
-    throw std::logic_error("ssl support is not implemented");
-  //  SslServerFeature* ssl =
-  //      application_features::ApplicationServer::getFeature<SslServerFeature>(
-  //          "SslServer");
+    SslServerFeature* ssl =
+        application_features::ApplicationServer::getFeature<SslServerFeature>(
+            "SslServer");
 
-  //  // check the ssl context
-  //  if (ssl->sslContext() == nullptr) {
-  //    LOG(FATAL) << "no ssl context is known, cannot create https server, "
-  //                  "please use the '--ssl.keyfile' option";
-  //    FATAL_ERROR_EXIT();
-  //  }
+    // check the ssl context
+    if (ssl->sslContext() == nullptr) {
+      LOG(FATAL) << "no ssl context is known, cannot create https server, "
+                    "please use the '--ssl.keyfile' option";
+      FATAL_ERROR_EXIT();
+    }
 
-  //  SSL_CTX* sslContext = ssl->sslContext();
+    SSL_CTX* sslContext = ssl->sslContext();
 
-  //  // https
-  //  httpServer = new HttpsServer(_keepAliveTimeout,
-  //                               _allowMethodOverride,
-  //                               _accessControlAllowOrigins, sslContext);
+    // https
+    httpServer = new GeneralServer(_keepAliveTimeout, _allowMethodOverride,
+                                   _accessControlAllowOrigins, sslContext);
 
-  //  httpServer->setEndpointList(&endpointList);
-  //  _servers.push_back(httpServer);
+    httpServer->setEndpointList(&endpointList);
+    _servers.push_back(httpServer);
   }
 }
 

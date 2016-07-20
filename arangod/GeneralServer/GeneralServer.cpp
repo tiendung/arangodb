@@ -67,14 +67,17 @@ int GeneralServer::sendChunk(uint64_t taskId, std::string const& data) {
 
 GeneralServer::GeneralServer(
     double keepAliveTimeout, bool allowMethodOverride,
-    std::vector<std::string> const& accessControlAllowOrigins)
+    std::vector<std::string> const& accessControlAllowOrigins, SSL_CTX* ctx)
     : _listenTasks(),
       _endpointList(nullptr),
       _commTasks(),
       _keepAliveTimeout(keepAliveTimeout),
       _allowMethodOverride(allowMethodOverride),
-      _accessControlAllowOrigins(accessControlAllowOrigins) {}
-
+      _accessControlAllowOrigins(accessControlAllowOrigins),
+      _ctx(ctx),
+      _verificationMode(SSL_VERIFY_NONE),
+      _verificationCallback(0),
+      _sslAllowed(ctx != nullptr) {}
 ////////////////////////////////////////////////////////////////////////////////
 /// @brief destructs a general server
 ////////////////////////////////////////////////////////////////////////////////
@@ -291,12 +294,20 @@ bool GeneralServer::openEndpoint(Endpoint* endpoint) {
 
   if (endpoint->transport() == Endpoint::TransportType::HTTP) {
     if (endpoint->encryption() == Endpoint::EncryptionType::SSL) {
+      if (!_sslAllowed) {  // we should not end up here
+        LOG(FATAL) << "no ssl context";
+        FATAL_ERROR_EXIT();
+      }
       connectionType = ConnectionType::HTTPS;
     } else {
       connectionType = ConnectionType::HTTP;
     }
   } else {
     if (endpoint->encryption() == Endpoint::EncryptionType::SSL) {
+      if (!_sslAllowed) {  // we should not end up here
+        LOG(FATAL) << "no ssl context";
+        FATAL_ERROR_EXIT();
+      }
       connectionType = ConnectionType::VPPS;
     } else {
       connectionType = ConnectionType::VPP;

@@ -32,6 +32,7 @@
 #include "Basics/Mutex.h"
 #include "Endpoint/ConnectionInfo.h"
 #include "GeneralServer/RestHandler.h"
+#include <openssl/ssl.h>
 
 namespace arangodb {
 class EndpointList;
@@ -56,12 +57,13 @@ class GeneralServer : protected TaskManager {
 
  public:
   GeneralServer(double keepAliveTimeout, bool allowMethodOverride,
-                std::vector<std::string> const& accessControlAllowOrigins);
+                std::vector<std::string> const& accessControlAllowOrigins,
+                SSL_CTX* ctx = nullptr);
   virtual ~GeneralServer();
 
  public:
   // returns the protocol
-  virtual char const* protocol() const { return "http"; }
+  // virtual char const* protocol() const { return "http"; }
 
   // check, if we allow a method override
   bool allowMethodOverride() { return _allowMethodOverride; }
@@ -144,6 +146,12 @@ class GeneralServer : protected TaskManager {
 
   // list of trusted origin urls for CORS
   std::vector<std::string> const _accessControlAllowOrigins;
+
+ private:
+  SSL_CTX* _ctx;
+  int _verificationMode;
+  int (*_verificationCallback)(int, X509_STORE_CTX*);
+  bool _sslAllowed;
 };
 }
 }

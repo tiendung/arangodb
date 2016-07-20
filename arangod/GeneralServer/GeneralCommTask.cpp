@@ -45,9 +45,10 @@ using namespace arangodb::rest;
 /// @brief static initializers
 ////////////////////////////////////////////////////////////////////////////////
 
-size_t const GeneralCommTask::MaximalHeaderSize = 1 * 1024 * 1024;      //   1 MB
-size_t const GeneralCommTask::MaximalBodySize = 512 * 1024 * 1024;      // 512 MB
-size_t const GeneralCommTask::MaximalPipelineSize = 512 * 1024 * 1024;  // 512 MB
+size_t const GeneralCommTask::MaximalHeaderSize = 1 * 1024 * 1024;  //   1 MB
+size_t const GeneralCommTask::MaximalBodySize = 512 * 1024 * 1024;  // 512 MB
+size_t const GeneralCommTask::MaximalPipelineSize =
+    512 * 1024 * 1024;  // 512 MB
 size_t const GeneralCommTask::RunCompactEvery = 500;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -55,12 +56,13 @@ size_t const GeneralCommTask::RunCompactEvery = 500;
 ////////////////////////////////////////////////////////////////////////////////
 
 GeneralCommTask::GeneralCommTask(GeneralServer* server, TRI_socket_t socket,
-                           ConnectionInfo&& info, double keepAliveTimeout)
+                                 ConnectionInfo&& info, double keepAliveTimeout)
     : Task("GeneralCommTask"),
       SocketTask(socket, keepAliveTimeout),
       _connectionInfo(std::move(info)),
       _server(server),
       _allowMethodOverride(server->allowMethodOverride()),
+      _protocol("unknown"),
       _writeBuffers(),
       _writeBuffersStats(),
       _readPosition(0),
@@ -133,9 +135,9 @@ void GeneralCommTask::handleSimpleError(GeneralResponse::ResponseCode code) {
   addResponse(&response);
 }
 
-void GeneralCommTask::handleSimpleError(GeneralResponse::ResponseCode responseCode,
-                                     int errorNum,
-                                     std::string const& errorMessage) {
+void GeneralCommTask::handleSimpleError(
+    GeneralResponse::ResponseCode responseCode, int errorNum,
+    std::string const& errorMessage) {
   HttpResponse response(responseCode);
 
   VPackBuilder builder;
@@ -147,7 +149,8 @@ void GeneralCommTask::handleSimpleError(GeneralResponse::ResponseCode responseCo
   builder.close();
 
   try {
-    response.setPayload(_request, builder.slice(), true, VPackOptions::Defaults);
+    response.setPayload(_request, builder.slice(), true,
+                        VPackOptions::Defaults);
 
     clearRequest();
     handleResponse(&response);
@@ -296,7 +299,7 @@ bool GeneralCommTask::processRead() {
 
       // update the connection information, i. e. client and server addresses
       // and ports
-      _request->setProtocol(_server->protocol());
+      _request->setProtocol(_protocol);
 
       LOG(TRACE) << "server port " << _connectionInfo.serverPort
                  << ", client port " << _connectionInfo.clientPort;
@@ -321,10 +324,11 @@ bool GeneralCommTask::processRead() {
 
           // if the request asks to allow credentials, we'll check against the
           // configured whitelist of origins
-          std::vector<std::string> const& accessControlAllowOrigins = _server->trustedOrigins();
+          std::vector<std::string> const& accessControlAllowOrigins =
+              _server->trustedOrigins();
 
           if (StringUtils::boolean(allowCredentials) &&
-              !accessControlAllowOrigins.empty())  {
+              !accessControlAllowOrigins.empty()) {
             if (accessControlAllowOrigins[0] == "*") {
               // special case: allow everything
               _denyCredentials = false;
@@ -332,10 +336,14 @@ bool GeneralCommTask::processRead() {
               // copy origin string
               if (_origin[_origin.size() - 1] == '/') {
                 // strip trailing slash
-                auto result = std::find(accessControlAllowOrigins.begin(), accessControlAllowOrigins.end(), _origin.substr(0, _origin.size() - 1));
+                auto result = std::find(accessControlAllowOrigins.begin(),
+                                        accessControlAllowOrigins.end(),
+                                        _origin.substr(0, _origin.size() - 1));
                 _denyCredentials = (result == accessControlAllowOrigins.end());
               } else {
-                auto result = std::find(accessControlAllowOrigins.begin(), accessControlAllowOrigins.end(), _origin);
+                auto result =
+                    std::find(accessControlAllowOrigins.begin(),
+                              accessControlAllowOrigins.end(), _origin);
                 _denyCredentials = (result == accessControlAllowOrigins.end());
               }
             } else {
@@ -545,8 +553,7 @@ bool GeneralCommTask::processRead() {
   // not authenticated
   else {
     HttpResponse response(GeneralResponse::ResponseCode::UNAUTHORIZED);
-    std::string realm =
-      "Bearer token_type=\"JWT\", realm=\"ArangoDB\"";
+    std::string realm = "Bearer token_type=\"JWT\", realm=\"ArangoDB\"";
 
     response.setHeaderNC(StaticStrings::WwwAuthenticate, std::move(realm));
 
@@ -837,10 +844,11 @@ void GeneralCommTask::processRequest() {
   }
 
   // check for an HLC time stamp
-  std::string const& timeStamp = _request->header(StaticStrings::HLCHeader, found);
+  std::string const& timeStamp =
+      _request->header(StaticStrings::HLCHeader, found);
   if (found) {
-    uint64_t timeStampInt
-        = arangodb::basics::HybridLogicalClock::decodeTimeStampWithCheck(
+    uint64_t timeStampInt =
+        arangodb::basics::HybridLogicalClock::decodeTimeStampWithCheck(
             timeStamp);
     if (timeStampInt != 0) {
       TRI_HybridLogicalClock(timeStampInt);
@@ -872,7 +880,8 @@ void GeneralCommTask::processRequest() {
 
   if (_request != nullptr) {
     bool found;
-    std::string const& startThread = _request->header(StaticStrings::StartThread, found);
+    std::string const& startThread =
+        _request->header(StaticStrings::StartThread, found);
 
     if (found) {
       _startThread = StringUtils::boolean(startThread);

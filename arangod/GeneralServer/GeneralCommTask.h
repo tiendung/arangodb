@@ -133,6 +133,8 @@ class GeneralCommTask : public SocketTask, public RequestStatisticsAgent {
   // allow method override
   bool _allowMethodOverride;
 
+  char const* _protocol;
+
  private:
   // write buffers
   std::deque<basics::StringBuffer*> _writeBuffers;
@@ -205,6 +207,7 @@ class GeneralCommTask : public SocketTask, public RequestStatisticsAgent {
 
   // authentication real
   std::string const _authenticationRealm;
+
 };  // Commontask
 
 class HttpCommTask : public GeneralCommTask {
@@ -212,7 +215,9 @@ class HttpCommTask : public GeneralCommTask {
   HttpCommTask(GeneralServer* serv, TRI_socket_t sock, ConnectionInfo&& info,
                double timeout)
       : Task("HttpCommTask"),
-        GeneralCommTask(serv, sock, std::move(info), timeout) {}
+        GeneralCommTask(serv, sock, std::move(info), timeout) {
+    _protocol = "http";
+  }
 };
 
 }  // rest
